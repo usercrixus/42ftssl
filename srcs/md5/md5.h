@@ -1,0 +1,13 @@
+#pragma once
+
+#include "../parse.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include "../../42libft/ft_str/ft_str.h"
+#include "md5Encode.h"
+
+void manageMD5(char *flags, char *input);
