@@ -4,7 +4,8 @@ OBJ = \
 	srcs/md5/md5Encode.o \
 	srcs/sha256/sha256.o \
 	srcs/sha256/sha256Encode.o \
-	srcs/parse.o \
+	srcs/helper/parse.o \
+	srcs/helper/utils.o \
 
 all: ft_ssl
 
@@ -28,4 +29,13 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: clean fclean re
+test:
+	dd if=/dev/zero bs=1000000 count=1 2>/dev/null | tr '\0' 'A' | \
+	valgrind --leak-check=full --show-leak-kinds=all ./ft_ssl md5
+
+	dd if=/dev/zero bs=1000000 count=1 2>/dev/null | tr '\0' 'A' | \
+	valgrind --leak-check=full --show-leak-kinds=all ./ft_ssl sha256
+
+	./test/test_ft_ssl.sh 
+
+.PHONY: clean fclean re test

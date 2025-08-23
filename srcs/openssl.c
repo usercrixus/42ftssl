@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "openssl.h"
-#include "parse.h"
-
+#include "helper/parse.h"
+#include "md5/md5.h"
+#include "sha256/sha256.h"
 
 /* return FLAGS without any char present in DROP (static buffer) */
 static char *flags_without_many(const char *flags, const char *drop)

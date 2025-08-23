@@ -176,6 +176,17 @@ run './ft_ssl sha256 -r -q -p -s "foo" file (4 lines)' \
   'echo "just to be extra clear" | '"$FTSSL"' sha256 -r -q -p -s "foo" file' \
   'just to be extra clear\n2716525f352ca213b295bf1b05a7aebc31a114a92f8345a1f636a1223a762759\n2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae\nf9eb9a5a063eb386a18525c074e1065c316ec434f911e0d7d59ba2d9fd134705'
 
+# --- Huge stdin (exactly 1,000,000 'A' bytes) ---
+run './ft_ssl md5 huge stdin (1e6)' \
+  '(dd if=/dev/zero bs=1000000 count=1 2>/dev/null | tr "\0" "A") | '"$FTSSL"' md5' \
+  '\(stdin\)= 48fcdb8b87ce8ef779774199a856091d'
+
+run './ft_ssl sha256 huge stdin (1e6)' \
+  '(dd if=/dev/zero bs=1000000 count=1 2>/dev/null | tr "\0" "A") | '"$FTSSL"' sha256' \
+  '\(stdin\)= e23c0cda5bcdecddec446b54439995c7260c8cdcf2953eec9f5cdb6948e5898d'
+
+rm "file"
+
 echo
 if [[ $fail -eq 0 ]]; then
   echo "✅ OK — $pass tests passed."

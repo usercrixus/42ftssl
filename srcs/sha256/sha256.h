@@ -11,6 +11,4 @@ typedef struct
 } SHA256_CONTEXT;
 
 void manageSHA256(char *flags, char *input);
-void sha256_manageString(char *flags, char *input, char *title);
-void sha256_manageFile(char *flags, const char *path);
-void sha256_manageSTDIN(char *flags);
+

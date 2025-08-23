@@ -5,6 +5,9 @@
         "chrono": "c",
         "unordered_map": "c",
         "fcntl.h": "c",
-        "ostream": "c"
+        "ostream": "c",
+        "sha256.h": "c",
+        "string.h": "c",
+        "ft_str.h": "c"
     }
 }

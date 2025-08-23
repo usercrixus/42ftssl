@@ -1,58 +1,13 @@
 #include "sha256.h"
 #include "sha256Encode.h"
-#include "../parse.h"
+#include "../helper/parse.h"
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
-
-/* ───────────────────────── helpers ───────────────────────── */
-
-static void print_hex(const unsigned char *d, size_t n)
-{
-    for (size_t i = 0; i < n; ++i)
-        printf("%02x", d[i]);
-}
-
-static unsigned char *read_all_stdin(size_t *out_len)
-{
-    size_t cap = 4096, len = 0;
-    unsigned char *buf = malloc(cap);
-    if (!buf)
-    {
-        perror("malloc");
-        exit(1);
-    }
-    unsigned char tmp[4096];
-    ssize_t n;
-    while ((n = read(STDIN_FILENO, tmp, sizeof(tmp))) > 0)
-    {
-        if (len + (size_t)n > cap)
-        {
-            cap = (len + (size_t)n) * 2;
-            unsigned char *nb = realloc(buf, cap);
-            if (!nb)
-            {
-                free(buf);
-                perror("realloc");
-                exit(1);
-            }
-            buf = nb;
-        }
-        memcpy(buf + len, tmp, (size_t)n);
-        len += (size_t)n;
-    }
-    if (n < 0)
-    {
-        perror("read");
-        free(buf);
-        exit(1);
-    }
-    *out_len = len;
-    return buf;
-}
+#include "../helper/utils.h"
 
 static void sha256_digest_bytes(const unsigned char *data, size_t len, unsigned char out[32])
 {
@@ -193,21 +148,11 @@ void manageSHA256(char *flags, char *input)
     const int piped = !isatty(STDIN_FILENO);
 
     if (!input && !has_s && piped)
-    {
         do_stdin(flags);
-        return;
-    }
-    if (has_p && input == NULL)
-    {
+    else if (has_p && input == NULL)
         do_stdin(flags);
-    }
-    if (has_s && input)
-    {
+    else if (has_s && input)
         do_string(flags, input, input);
-        return;
-    }
-    if (input)
-    {
+    else if (input)
         do_file(flags, input);
-    }
 }

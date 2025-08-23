@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../parse.h"
+#include "../helper/parse.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

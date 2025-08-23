@@ -1,3 +1,44 @@
+# Build, Run & Test
+
+## Prereqs
+- POSIX shell + coreutils (`bash`, `dd`, `tr`, `grep -P`)
+- `valgrind` (for memcheck)
+- `openssl`, `md5sum`, `sha256sum` (used by the test script for cross-checks)
+- Git submodules enabled (for `42libft`)
+
+> macOS note: `md5sum`/`sha256sum` aren’t standard on macOS. Install via Homebrew (`brew install coreutils`) and use `gmd5sum`/`gsha256sum`, or skip the lines in the script that call them.
+
+## Build
+```bash
+# from repo root
+make            # builds ./ft_ssl (brings submodules + libft)
+```
+
+Targets:
+- `make` / `make all` – build `ft_ssl`
+- `make clean` – remove objects
+- `make fclean` – remove objects + binary
+- `make re` – full rebuild
+- `make test` – Full Test Suite
+
+## Quick Usage
+```bash
+# stdin
+echo "42 is nice" | ./ft_ssl md5
+echo "42 is nice" | ./ft_ssl sha256
+
+# flags
+./ft_ssl md5 -p
+./ft_ssl md5 -s "foo"
+./ft_ssl md5 -q file
+./ft_ssl md5 -r file
+
+./ft_ssl sha256 -p
+./ft_ssl sha256 -s "foo"
+./ft_ssl sha256 -q file
+./ft_ssl sha256 -r file
+```
+
 # ft_ssl – Flag & Routing Logic (MD5 / SHA256)
 
 This document explains **how flags are interpreted**, **how inputs are routed** (stdin / `-s` / file), and **how errors are reported**. It intentionally focuses on **logic**, not implementation details.
