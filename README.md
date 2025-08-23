@@ -1,3 +1,10 @@
+# ft_ssl
+
+A minimal reimplementation of the classic `openssl` message digest utility.  
+It supports **MD5** and **SHA256** hashing, with flag handling (`-p`, `-q`, `-r`, `-s`) and routing logic for stdin, string literals, and files.  
+The goal is to replicate the behavior of `openssl`/`md5sum` closely, including error handling and output formatting, while keeping the code clean and structured.
+
+
 # Build, Run & Test
 
 ## Prereqs
@@ -41,7 +48,7 @@ echo "42 is nice" | ./ft_ssl sha256
 
 # ft_ssl – Flag & Routing Logic (MD5 / SHA256)
 
-This document explains **how flags are interpreted**, **how inputs are routed** (stdin / `-s` / file), and **how errors are reported**. It intentionally focuses on **logic**, not implementation details.
+This part explains **how flags are interpreted**, **how inputs are routed** (stdin / `-s` / file), and **how errors are reported**. It intentionally focuses on **logic**, not implementation details.
 
 The behavior below matches the provided test suite exactly.
 
