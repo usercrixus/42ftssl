@@ -186,6 +186,7 @@ run './ft_ssl sha256 huge stdin (1e6)' \
   '\(stdin\)= e23c0cda5bcdecddec446b54439995c7260c8cdcf2953eec9f5cdb6948e5898d'
 
 rm "file"
+rm "website"
 
 echo
 if [[ $fail -eq 0 ]]; then
