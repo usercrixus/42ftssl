@@ -4,6 +4,7 @@
         "format": "c",
         "chrono": "c",
         "unordered_map": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "ostream": "c"
     }
 }
