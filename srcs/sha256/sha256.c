@@ -8,142 +8,206 @@
 #include <stdlib.h>
 #include <errno.h>
 
-/* -- helpers identical to your existing print style -- */
-static void sha256_print_hex(const unsigned char *digest, int bytes)
+/* ───────────────────────── helpers ───────────────────────── */
+
+static void print_hex(const unsigned char *d, size_t n)
 {
-    for (int i = 0; i < bytes; ++i) printf("%02x", digest[i]);
+    for (size_t i = 0; i < n; ++i)
+        printf("%02x", d[i]);
 }
 
-/* string mode */
-static void manageString(char *flags, const char *input, const char *title)
+static unsigned char *read_all_stdin(size_t *out_len)
 {
-    unsigned char digest[32];
-    SHA256_CONTEXT ctx;
-    SHA256Init(&ctx);
-    SHA256Update(&ctx, (const unsigned char *)input, (uint64_t)strlen(input));
-    SHA256Final(digest, &ctx);
-
-    if (flags && isFlagSet(flags, 'q')) {
-        sha256_print_hex(digest, 32);
-        printf("\n");
-    } else if (flags && isFlagSet(flags, 'r')) {
-        sha256_print_hex(digest, 32);
-        printf(" \"%s\"\n", input);
-    } else {
-        printf("SHA256 (\"%s\") = ", title);
-        sha256_print_hex(digest, 32);
-        printf("\n");
-    }
-}
-
-/* file mode */
-static void manageFile(char *flags, const char *path)
-{
-    int fd = open(path, O_RDONLY);
-    if (fd < 0) { perror(path); exit(1); }
-
-    unsigned char buffer[4096], digest[32];
-    ssize_t n;
-    SHA256_CONTEXT ctx;
-    SHA256Init(&ctx);
-    while ((n = read(fd, buffer, sizeof(buffer))) > 0)
-        SHA256Update(&ctx, buffer, (uint64_t)n);
-    if (n < 0) { int e = errno; close(fd); errno = e; perror("read"); exit(1); }
-    close(fd);
-    SHA256Final(digest, &ctx);
-
-    if (flags && isFlagSet(flags, 'q')) {
-        sha256_print_hex(digest, 32);
-        printf("\n");
-    } else if (flags && isFlagSet(flags, 'r')) {
-        sha256_print_hex(digest, 32);
-        printf(" %s\n", path);
-    } else {
-        printf("SHA256 (%s) = ", path);
-        sha256_print_hex(digest, 32);
-        printf("\n");
-    }
-}
-
-/* stdin mode: buffer so we can echo and (for -p) trim one trailing '\n' from the hash */
-static void manageSTDIN(char *flags)
-{
-    int has_p = (flags && isFlagSet(flags, 'p'));
-    int has_q = (flags && isFlagSet(flags, 'q'));
-
-    /* read-all buffering (like your MD5 manageSTDIN) */
     size_t cap = 4096, len = 0;
-    unsigned char *all = (unsigned char *)malloc(cap);
-    if (!all) { perror("malloc"); exit(1); }
-
+    unsigned char *buf = malloc(cap);
+    if (!buf)
+    {
+        perror("malloc");
+        exit(1);
+    }
     unsigned char tmp[4096];
     ssize_t n;
-    while ((n = read(STDIN_FILENO, tmp, sizeof(tmp))) > 0) {
-        if (len + (size_t)n > cap) {
+    while ((n = read(STDIN_FILENO, tmp, sizeof(tmp))) > 0)
+    {
+        if (len + (size_t)n > cap)
+        {
             cap = (len + (size_t)n) * 2;
-            unsigned char *nb = (unsigned char *)realloc(all, cap);
-            if (!nb) { free(all); perror("realloc"); exit(1); }
-            all = nb;
+            unsigned char *nb = realloc(buf, cap);
+            if (!nb)
+            {
+                free(buf);
+                perror("realloc");
+                exit(1);
+            }
+            buf = nb;
         }
-        memcpy(all + len, tmp, (size_t)n);
+        memcpy(buf + len, tmp, (size_t)n);
         len += (size_t)n;
     }
-    if (n < 0) { perror("read"); free(all); exit(1); }
-
-    /* echo if -p (exact bytes) */
-    if (has_p && len) {
-        if (write(STDOUT_FILENO, all, len) < 0) { perror("write"); free(all); exit(1); }
+    if (n < 0)
+    {
+        perror("read");
+        free(buf);
+        exit(1);
     }
+    *out_len = len;
+    return buf;
+}
 
-    /* build digest; if -p, trim exactly one trailing '\n' from the *hash input* */
-    size_t hash_len = len;
-    if (has_p && hash_len && all[hash_len - 1] == '\n') hash_len -= 1;
-
-    unsigned char digest[32];
+static void sha256_digest_bytes(const unsigned char *data, size_t len, unsigned char out[32])
+{
     SHA256_CONTEXT ctx;
     SHA256Init(&ctx);
-    if (hash_len) SHA256Update(&ctx, all, (uint64_t)hash_len);
-    SHA256Final(digest, &ctx);
+    if (len)
+        SHA256Update(&ctx, data, (uint64_t)len);
+    SHA256Final(out, &ctx);
+}
 
-    if (has_q) {
-        sha256_print_hex(digest, 32);
+/* ─────────────────────── mode: string ─────────────────────── */
+
+static void do_string(char *flags, const char *input, const char *title)
+{
+    unsigned char dig[32];
+    sha256_digest_bytes((const unsigned char *)input, strlen(input), dig);
+
+    if (flags && isFlagSet(flags, 'q'))
+    {
+        print_hex(dig, 32);
         printf("\n");
-    } else if (has_p) {
-        /* echo was already printed; just the hex line next */
-        sha256_print_hex(digest, 32);
+    }
+    else if (flags && isFlagSet(flags, 'r'))
+    {
+        print_hex(dig, 32);
+        printf(" \"%s\"\n", input);
+    }
+    else
+    {
+        printf("SHA256 (\"%s\") = ", title);
+        print_hex(dig, 32);
         printf("\n");
-    } else {
-        /* no -p/-q: label like MD5 */
+    }
+}
+
+/* ───────────────────────── mode: file ─────────────────────── */
+
+static void do_file(char *flags, const char *path)
+{
+    int fd = open(path, O_RDONLY);
+    if (fd < 0)
+    {
+        perror(path);
+        exit(1);
+    }
+
+    unsigned char buf[4096], dig[32];
+    ssize_t n;
+    SHA256_CONTEXT ctx;
+    SHA256Init(&ctx);
+    while ((n = read(fd, buf, sizeof(buf))) > 0)
+        SHA256Update(&ctx, buf, (uint64_t)n);
+    if (n < 0)
+    {
+        int e = errno;
+        close(fd);
+        errno = e;
+        perror("read");
+        exit(1);
+    }
+    close(fd);
+    SHA256Final(dig, &ctx);
+
+    if (flags && isFlagSet(flags, 'q'))
+    {
+        print_hex(dig, 32);
+        printf("\n");
+    }
+    else if (flags && isFlagSet(flags, 'r'))
+    {
+        print_hex(dig, 32);
+        printf(" %s\n", path);
+    }
+    else
+    {
+        printf("SHA256 (%s) = ", path);
+        print_hex(dig, 32);
+        printf("\n");
+    }
+}
+
+/* ──────────────────────── mode: stdin ─────────────────────── */
+
+static void do_stdin(char *flags)
+{
+    const int has_p = (flags && isFlagSet(flags, 'p'));
+    const int has_q = (flags && isFlagSet(flags, 'q'));
+
+    size_t len = 0;
+    unsigned char *all = read_all_stdin(&len);
+
+    /* SHA-256 policy: with -p, trim exactly one trailing '\n' from the hash input (keep echo intact). */
+    size_t hash_len = len;
+    if (has_p && hash_len && all[hash_len - 1] == '\n')
+        hash_len -= 1;
+
+    unsigned char dig[32];
+    sha256_digest_bytes(all, hash_len, dig);
+
+    if (has_p && len)
+    {
+        if (write(STDOUT_FILENO, all, len) < 0)
+        {
+            perror("write");
+            free(all);
+            exit(1);
+        }
+    }
+
+    if (has_q)
+    {
+        if (has_p && (!len || all[len - 1] != '\n'))
+            printf("\n"); /* match MD5 nicety */
+        print_hex(dig, 32);
+        printf("\n");
+    }
+    else if (has_p)
+    {
+        print_hex(dig, 32);
+        printf("\n");
+    }
+    else
+    {
         printf("(stdin)= ");
-        sha256_print_hex(digest, 32);
+        print_hex(dig, 32);
         printf("\n");
     }
 
     free(all);
 }
 
-/* public entry: mirror MD5 flow – only read stdin if this invocation is for stdin */
+/* ───────────────────────── public API ─────────────────────── */
+
 void manageSHA256(char *flags, char *input)
 {
-    int has_p = (flags && isFlagSet(flags, 'p'));
-    int has_s = (flags && isFlagSet(flags, 's'));
-    int stdin_piped = !isatty(STDIN_FILENO);
+    const int has_p = (flags && isFlagSet(flags, 'p'));
+    const int has_s = (flags && isFlagSet(flags, 's'));
+    const int piped = !isatty(STDIN_FILENO);
 
-    /* Pure piped stdin (no -s, no input path) */
-    if (!input && !has_s && stdin_piped) {
-        manageSTDIN(flags);
+    if (!input && !has_s && piped)
+    {
+        do_stdin(flags);
         return;
     }
-
-    /* Only read stdin (-p) when this call is for stdin */
     if (has_p && input == NULL)
-        manageSTDIN(flags);
-
-    if (has_s && input) {
-        manageString(flags, input, input);
-        return; /* do not fall through to file */
+    {
+        do_stdin(flags);
     }
-
+    if (has_s && input)
+    {
+        do_string(flags, input, input);
+        return;
+    }
     if (input)
-        manageFile(flags, input);
+    {
+        do_file(flags, input);
+    }
 }
