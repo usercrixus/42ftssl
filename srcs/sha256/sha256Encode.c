@@ -13,8 +13,7 @@ static void be32enc(unsigned char out[4], uint32_t x)
 }
 static uint32_t be32dec(const unsigned char in[4])
 {
-    return ((uint32_t)in[0] << 24) | ((uint32_t)in[1] << 16) |
-           ((uint32_t)in[2] << 8) | ((uint32_t)in[3]);
+    return ((uint32_t)in[0] << 24) | ((uint32_t)in[1] << 16) | ((uint32_t)in[2] << 8) | ((uint32_t)in[3]);
 }
 
 static void sha256_process_block(uint32_t state[8], const unsigned char block[64])
@@ -72,7 +71,7 @@ void SHA256Init(SHA256_CONTEXT *ctx)
 void SHA256Update(SHA256_CONTEXT *ctx, const unsigned char *input, uint64_t len)
 {
     uint64_t index = (ctx->totalBit / 8) % 64;
-    ctx->totalBit += (uint64_t)len * 8;
+    ctx->totalBit += len * 8;
 
     uint64_t available = 64 - index;
     uint64_t i = 0;
@@ -88,7 +87,7 @@ void SHA256Update(SHA256_CONTEXT *ctx, const unsigned char *input, uint64_t len)
     memcpy(&ctx->buffer[index], &input[i], len - i);
 }
 
-static void sha256_finalize(SHA256_CONTEXT *ctx, unsigned char digest[32])
+void SHA256Final(unsigned char digest[32], SHA256_CONTEXT *ctx)
 {
     unsigned char pad[64] = {0x80};
     unsigned char len_be[8];
@@ -109,16 +108,4 @@ static void sha256_finalize(SHA256_CONTEXT *ctx, unsigned char digest[32])
 
     // wipe context
     memset(ctx, 0, sizeof(*ctx));
-}
-
-void SHA256Final(unsigned char digest[32], SHA256_CONTEXT *ctx)
-{
-    sha256_finalize(ctx, digest);
-}
-
-int sha256_print_digest(const unsigned char *digest, int bytes)
-{
-    for (int i = 0; i < bytes; ++i)
-        printf("%02x", digest[i]);
-    return bytes;
 }

@@ -11,4 +11,3 @@ typedef struct
 } SHA256_CONTEXT;
 
 void manageSHA256(char *flags, char *input);
-
