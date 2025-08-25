@@ -4,6 +4,7 @@
 #include "helper/parse.h"
 #include "md5/md5.h"
 #include "sha256/sha256.h"
+#include "../42libft/ft_printf/ft_printf.h"
 
 /* return FLAGS without any char present in DROP (static buffer) */
 static char *flags_without_many(const char *flags, const char *drop)
@@ -48,16 +49,16 @@ static void print_errors(t_option option, const t_cmd_data *cli)
 {
 	const char *name = (option == MD5) ? "md5" : "sha256";
 	for (int i = 0; i < cli->errc; ++i)
-		fprintf(stderr, "ft_ssl: %s: %s: No such file or directory\n", name, cli->errv[i]);
+		ft_printf("ft_ssl: %s: %s: No such file or directory\n", name, cli->errv[i]);
 }
 
 int main(int argc, char **argv)
 {
 	if (argc < 2)
-		return (fprintf(stderr, "Bad usage, need at least 2 args\n"), 1);
+		return (ft_printf("Bad usage, need at least 2 args\n"), 1);
 	t_option option = parse_cmd(argv[1]);
 	if (option == NONE)
-		return (fprintf(stderr, "ft_ssl: Error: '%s' is an invalid command", argv[1]), 1);
+		return (ft_printf("ft_ssl: Error: '%s' is an invalid command", argv[1]), 1);
 	/* command only; if stdin is piped, hash it with default formatting */
 	if (argc < 3)
 	{
@@ -69,7 +70,7 @@ int main(int argc, char **argv)
 				manageSHA256(NULL, NULL);
 			return 0;
 		}
-		return (fprintf(stderr, "Bad usage, need at least 2 args\n"), 1);
+		return (ft_printf("Bad usage, need at least 2 args\n"), 1);
 	}
 	t_cmd_data data;
 	parse_data(argc, argv, &data);
@@ -77,7 +78,6 @@ int main(int argc, char **argv)
 		dispatch_md5(&data);
 	else
 		dispatch_sha256(&data);
-	fflush(stdout);
 	print_errors(option, &data);
 	return 0;
 }
