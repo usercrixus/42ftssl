@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "../../42libft/ft_str/ft_str.h"
 #include <stdio.h>
+#include "../../42libft/ft_printf/ft_printf.h"
 
 unsigned char *read_all_stdin(size_t *out_len)
 {
@@ -25,8 +26,25 @@ unsigned char *read_all_stdin(size_t *out_len)
 	return (ft_str_free(buff), (unsigned char *)result);
 }
 
+#include <unistd.h>
+
 void print_hex(const unsigned char *d, size_t n)
 {
-    for (size_t i = 0; i < n; ++i)
-        printf("%02x", d[i]);
+	static const char HEX[] = "0123456789abcdef";
+	char buf[1024];
+	size_t bi = 0;
+
+	for (size_t i = 0; i < n; ++i)
+	{
+		unsigned char b = d[i];
+		if (bi + 2 > sizeof(buf))
+		{
+			(void)write(1, buf, bi);
+			bi = 0;
+		}
+		buf[bi++] = HEX[b >> 4];
+		buf[bi++] = HEX[b & 0x0F];
+	}
+	if (bi)
+		(void)write(1, buf, bi);
 }

@@ -10,7 +10,7 @@ OBJ = \
 all: ft_ssl
 
 ft_ssl: submodule libft.a $(OBJ)
-	gcc $(OBJ) -L./42libft/ft_str -lftstr -o $@
+	gcc $(OBJ) -L./42libft/ft_str -lftstr -L./42libft/ft_base -lft -lftstr -L./42libft/ft_printf -lftprintf -o $@
 
 %.o: %.c
 	gcc -c -Wall -Wextra -Werror $< -o $@

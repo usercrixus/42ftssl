@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "../helper/utils.h"
-
+#include "../../42libft/ft_printf/ft_printf.h"
 static void sha256_digest_bytes(const unsigned char *data, size_t len, unsigned char out[32])
 {
     SHA256_CONTEXT ctx;
@@ -28,18 +28,18 @@ static void do_string(char *flags, const char *input, const char *title)
     if (flags && isFlagSet(flags, 'q'))
     {
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
     else if (flags && isFlagSet(flags, 'r'))
     {
         print_hex(dig, 32);
-        printf(" \"%s\"\n", input);
+        ft_printf(" \"%s\"\n", input);
     }
     else
     {
-        printf("SHA256 (\"%s\") = ", title);
+        ft_printf("SHA256 (\"%s\") = ", title);
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
 }
 
@@ -74,18 +74,18 @@ static void do_file(char *flags, const char *path)
     if (flags && isFlagSet(flags, 'q'))
     {
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
     else if (flags && isFlagSet(flags, 'r'))
     {
         print_hex(dig, 32);
-        printf(" %s\n", path);
+        ft_printf(" %s\n", path);
     }
     else
     {
-        printf("SHA256 (%s) = ", path);
+        ft_printf("SHA256 (%s) = ", path);
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
 }
 
@@ -120,20 +120,20 @@ static void do_stdin(char *flags)
     if (has_q)
     {
         if (has_p && (!len || all[len - 1] != '\n'))
-            printf("\n"); /* match MD5 nicety */
+            ft_printf("\n"); /* match MD5 nicety */
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
     else if (has_p)
     {
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
     else
     {
-        printf("(stdin)= ");
+        ft_printf("(stdin)= ");
         print_hex(dig, 32);
-        printf("\n");
+        ft_printf("\n");
     }
 
     free(all);

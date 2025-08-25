@@ -1,6 +1,7 @@
 #include "md5.h"
 #include <unistd.h>
 #include "../helper/utils.h"
+#include "../../42libft/ft_printf/ft_printf.h"
 
 static void md5_digest_bytes(const unsigned char *data, size_t len, unsigned char out[16])
 {
@@ -21,18 +22,18 @@ static void do_string(char *flags, const char *input, const char *title)
 	if (flags && isFlagSet(flags, 'q'))
 	{
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 	else if (flags && isFlagSet(flags, 'r'))
 	{
 		print_hex(dig, 16);
-		printf(" \"%s\"\n", input);
+		ft_printf(" \"%s\"\n", input);
 	}
 	else
 	{
-		printf("MD5 (\"%s\") = ", title);
+		ft_printf("MD5 (\"%s\") = ", title);
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 }
 
@@ -65,18 +66,18 @@ static void do_file(char *flags, const char *path)
 	if (flags && isFlagSet(flags, 'q'))
 	{
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 	else if (flags && isFlagSet(flags, 'r'))
 	{
 		print_hex(dig, 16);
-		printf(" %s\n", path);
+		ft_printf(" %s\n", path);
 	}
 	else
 	{
-		printf("MD5 (%s) = ", path);
+		ft_printf("MD5 (%s) = ", path);
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 }
 
@@ -96,34 +97,36 @@ static void do_stdin(char *flags)
 
 	if (has_p && has_q)
 	{
-		fwrite(all, 1, len, stdout);
+		write(1, all, len);
 		if (len == 0 || all[len - 1] != '\n')
-			printf("\n");
+			ft_printf("\n");
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 	else if (has_p)
 	{
 		/* print: ("...")= <hex>, and hash was with the original bytes */
-		printf("(\"");
+		ft_printf("(\"");
 		size_t print_len = len;
 		if (print_len && all[print_len - 1] == '\n')
 			print_len--; /* visual nicety */
-		fwrite(all, 1, print_len, stdout);
-		printf("\")= ");
+		// write(1, all, print_len);
+		// fwrite(all, 1, print_len, stdout);
+		write(1, all, print_len);
+		ft_printf("\")= ");
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 	else if (has_q)
 	{
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 	else
 	{
-		printf("(stdin)= ");
+		ft_printf("(stdin)= ");
 		print_hex(dig, 16);
-		printf("\n");
+		ft_printf("\n");
 	}
 
 	free(all);

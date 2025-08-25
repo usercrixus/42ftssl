@@ -1,14 +1,15 @@
 #include "parse.h"
 #include <stddef.h>
 #include <string.h>
+#include "../../42libft/ft_base/libft.h"
 
 t_option parse_cmd(const char *cmd)
 {
 	if (!cmd)
 		return NONE;
-	if (strcmp(cmd, "md5") == 0)
+	if (ft_strncmp(cmd, "md5", ft_strlen("md5") + 1) == 0)
 		return MD5;
-	if (strcmp(cmd, "sha256") == 0)
+	if (ft_strncmp(cmd, "sha256", ft_strlen("sha256") + 1) == 0)
 		return SHA256;
 	return NONE;
 }
@@ -19,9 +20,9 @@ static void absorb_flag_group(const char *arg, char *flags_buff, char **s_arg, i
 	const char *p = arg + 1; /* skip '-' */
 	while (*p)
 	{
-		if (!strchr(flags_buff, *p))
+		if (!ft_strchr(flags_buff, *p))
 		{
-			size_t flags_buff_len = strlen(flags_buff);
+			size_t flags_buff_len = ft_strlen(flags_buff);
 			if (flags_buff_len + 1 < 64)
 			{
 				flags_buff[flags_buff_len] = *p;
@@ -45,7 +46,7 @@ void parse_data(int argc, char **argv, t_cmd_data *data)
 {
 	static char flags_buff[64];
 	int i = 2;
-	memset(data, 0, sizeof(*data));
+	ft_memset(data, 0, sizeof(*data));
 	flags_buff[0] = '\0';
 	if (argc > 2 && argv[2][0] == '-')
 	{
@@ -71,8 +72,10 @@ void parse_data(int argc, char **argv, t_cmd_data *data)
 
 bool isFlagSet(const char *flags, char c)
 {
-    if (!flags) return false;
-    for (int i = 0; flags[i]; ++i)
-        if (flags[i] == c) return true;
-    return false;
+	if (!flags)
+		return false;
+	for (int i = 0; flags[i]; ++i)
+		if (flags[i] == c)
+			return true;
+	return false;
 }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "md5Encode.h"
+#include "../../42libft/ft_base/libft.h"
 
 /**
  * 32-bit words to byte array (little-endian)
@@ -127,7 +128,7 @@ static void md5_process_block(uint32_t state[4], const unsigned char block[64])
 	state[2] += c;
 	state[3] += d;
 
-	memset(x, 0, sizeof(x)); // Clear sensitive data
+	ft_memset(x, 0, sizeof(x)); // Clear sensitive data
 }
 
 /**
@@ -140,7 +141,7 @@ void MD5Init(MD5_CONTEXT *ctx)
 	ctx->state[1] = 0xefcdab89;
 	ctx->state[2] = 0x98badcfe;
 	ctx->state[3] = 0x10325476;
-	memset(ctx->buffer, 0, sizeof(ctx->buffer));
+	ft_memset(ctx->buffer, 0, sizeof(ctx->buffer));
 }
 
 /**
@@ -154,7 +155,7 @@ void MD5Update(MD5_CONTEXT *ctx, const unsigned char *input, uint64_t inputLen)
 	uint64_t i = 0;
 	if (inputLen >= availableLen)
 	{
-		memcpy(&ctx->buffer[index], input, availableLen); // process the first element separatly, because there is maybe a remaining the the buffer
+		ft_memcpy(&ctx->buffer[index], input, availableLen); // process the first element separatly, because there is maybe a remaining the the buffer
 		md5_process_block(ctx->state, ctx->buffer);
 		for (i = availableLen; i + 63 < inputLen; i += 64)
 		{
@@ -162,7 +163,7 @@ void MD5Update(MD5_CONTEXT *ctx, const unsigned char *input, uint64_t inputLen)
 		}
 		index = 0;
 	}
-	memcpy(&ctx->buffer[index], &input[i], inputLen - i); // load the remaining in the buffer
+	ft_memcpy(&ctx->buffer[index], &input[i], inputLen - i); // load the remaining in the buffer
 }
 
 // Applies padding and appends length, finalizes digest
@@ -180,7 +181,7 @@ static void md5_finalize(MD5_CONTEXT *ctx, unsigned char digest[16])
 
 	md5_encode(digest, ctx->state, 16);
 
-	memset(ctx, 0, sizeof(*ctx)); // Clear sensitive data
+	ft_memset(ctx, 0, sizeof(*ctx)); // Clear sensitive data
 }
 
 // Ends an MD5 message-digest operation, writing the digest
