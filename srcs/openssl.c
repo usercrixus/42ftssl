@@ -55,7 +55,7 @@ static void print_errors(t_option option, const t_cmd_data *cli)
 int main(int argc, char **argv)
 {
 	if (argc < 2)
-		return (ft_printf("Bad usage, need at least 2 args\n"), 1);
+		return (ft_printf("usage: ft_ssl command [flags] [file/string]\n"), 1);
 	t_option option = parse_cmd(argv[1]);
 	if (option == NONE)
 		return (ft_printf("ft_ssl: Error: '%s' is an invalid command", argv[1]), 1);
