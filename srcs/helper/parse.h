@@ -1,13 +1,6 @@
 #pragma once
 #include <stdbool.h>
 
-typedef enum e_options
-{
-	MD5,
-	SHA256,
-	NONE
-} t_option;
-
 typedef struct s_cmd_data
 {
 	char *flags;	// unique chars in combined flag groups
@@ -19,4 +12,3 @@ typedef struct s_cmd_data
 
 bool isFlagSet(const char *flags, char c);
 void parse_data(int argc, char **argv, t_cmd_data *data);
-t_option parse_cmd(const char *cmd);

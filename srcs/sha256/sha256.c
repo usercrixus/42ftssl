@@ -9,6 +9,7 @@
 #include <errno.h>
 #include "../helper/utils.h"
 #include "../../42libft/ft_printf/ft_printf.h"
+
 static void sha256_digest_bytes(const unsigned char *data, size_t len, unsigned char out[32])
 {
     SHA256_CONTEXT ctx;

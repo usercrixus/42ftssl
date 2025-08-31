@@ -3,17 +3,6 @@
 #include <string.h>
 #include "../../42libft/ft_base/libft.h"
 
-t_option parse_cmd(const char *cmd)
-{
-	if (!cmd)
-		return NONE;
-	if (ft_strncmp(cmd, "md5", ft_strlen("md5") + 1) == 0)
-		return MD5;
-	if (ft_strncmp(cmd, "sha256", ft_strlen("sha256") + 1) == 0)
-		return SHA256;
-	return NONE;
-}
-
 /* add unique flag chars from token (like "-pqs"), capture -s VALUE if present */
 static void absorb_flag_group(const char *arg, char *flags_buff, char **s_arg, int argc, char **argv, int *i)
 {
