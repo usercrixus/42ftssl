@@ -1,49 +1,49 @@
 ## ft_ssl
 
-Implémentation minimale de l’utilitaire de hachage façon openssl, avec MD5 et SHA256. Comporte la gestion des flags -p, -q, -r, -s ainsi que l’entrée par stdin, chaîne et fichier.
+Minimal OpenSSL-like hashing utility implementing MD5 and SHA256. Supports flags `-p`, `-q`, `-r`, `-s` and input from stdin, string, and file.
 
-Compilation
+Build
 
-- Depuis la racine: `make`
-- Cibles utiles: `make clean`, `make fclean`, `make re`, `make test`
-- Le binaire est `./ft_ssl` (les sous-modules/libft sont gérés par le Makefile)
+- From repo root: `make`
+- Useful targets: `make clean`, `make fclean`, `make re`, `make test`
+- Binary: `./ft_ssl` (submodules/libft are handled by the Makefile)
 
 Tests
 
-- Rapide: `make test` (lance valgrind + script `test/test_ft_ssl.sh`)
-- Le script compare aussi avec `openssl`, `md5sum`, `sha256sum` si présents
+- Quick: `make test` (runs valgrind + `test/test_ft_ssl.sh`)
+- Also compares against `openssl`, `md5sum`, `sha256sum` when available
 
 Usage
 
-- Forme générale: `./ft_ssl <md5|sha256> [FLAGS] [FICHIER]`
-- Sans arguments et avec un pipe, lit et hache stdin.
+- General form: `./ft_ssl <md5|sha256> [FLAGS] [FILE]`
+- With no args and when piped, reads and hashes stdin.
 
 Flags
 
-- `-p`: lit stdin, réimprime tel quel puis affiche le digest
-- `-q`: mode silencieux, n’affiche que le digest
-- `-r`: format inversé (ex. `digest fichier`)
-- `-s <str>`: hache la chaîne littérale donnée
-- Les flags peuvent être groupés: `-pqr`
+- `-p`: read stdin, echo it back, then print the digest
+- `-q`: quiet mode, print only the digest
+- `-r`: reversed format (e.g., `digest filename`)
+- `-s <str>`: hash the given literal string
+- Flags can be grouped: `-pqr`
 
-Exemples MD5
+MD5 Examples
 
 - Stdin: `echo "42 is nice" | ./ft_ssl md5`
-- Stdin + écho: `echo "42 is nice" | ./ft_ssl md5 -p`
-- Chaîne: `./ft_ssl md5 -s "foo"`
-- Fichier silencieux: `./ft_ssl md5 -q file`
-- Fichier inversé: `./ft_ssl md5 -r file`
+- Stdin + echo: `echo "42 is nice" | ./ft_ssl md5 -p`
+- String: `./ft_ssl md5 -s "foo"`
+- File (quiet): `./ft_ssl md5 -q file`
+- File (reversed): `./ft_ssl md5 -r file`
 
-Exemples SHA256
+SHA256 Examples
 
 - Stdin: `echo "42 is nice" | ./ft_ssl sha256`
-- Stdin + écho: `echo "42 is nice" | ./ft_ssl sha256 -p`
-- Chaîne: `./ft_ssl sha256 -s "foo"`
-- Fichier silencieux: `./ft_ssl sha256 -q file`
-- Fichier inversé: `./ft_ssl sha256 -r file`
+- Stdin + echo: `echo "42 is nice" | ./ft_ssl sha256 -p`
+- String: `./ft_ssl sha256 -s "foo"`
+- File (quiet): `./ft_ssl sha256 -q file`
+- File (reversed): `./ft_ssl sha256 -r file`
 
 Notes
 
-- L’ordre de traitement est: `-p` (stdin) → `-s` (chaîne) → fichier.
-- Avec `-q`, seul le digest est imprimé (les labels/`-r` sont ignorés).
-- Le script de tests attend un shell POSIX et coreutils.
+- Processing order: `-p` (stdin) → `-s` (string) → file.
+- With `-q`, only the digest is printed (labels and `-r` formatting are ignored).
+- The test script expects a POSIX shell and coreutils.
