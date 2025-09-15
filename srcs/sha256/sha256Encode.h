@@ -22,6 +22,13 @@ static const uint32_t K256[64] = {
     0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
+typedef struct
+{
+    uint32_t state[8];        // H0..H7
+    uint64_t totalBit;        // total bits processed
+    unsigned char buffer[64]; // 512-bit block buffer
+} SHA256_CONTEXT;
+
 void SHA256Init(SHA256_CONTEXT *ctx);
 void SHA256Update(SHA256_CONTEXT *ctx, const unsigned char *input, uint64_t len);
 void SHA256Final(unsigned char digest[32], SHA256_CONTEXT *ctx);
